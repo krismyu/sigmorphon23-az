@@ -181,6 +181,7 @@ def main(argv):
     #path = '/home/hammond/Desktop/2023InflectionST-main/part1/data/'
 #    path = '/Users/hammond/Desktop/2023InflectionST-main/part1/data/'
     path = 'data/'
+    outpath = os.path.join('out', 'sys1')
     for opt, arg in options:
         if opt in ('-o', '--output'):
             OUTPUT = True
@@ -302,15 +303,15 @@ def main(argv):
 
 
         if TEST:
-            evallines = [line.strip() for line in open(path + lang.split("_")[0] + ".gold", "r") if line != '\n']
+            evallines = [line.strip() for line in open(path + lang.split("_")[0] + ".tst", "r") if line != '\n']
         num_seenlemma_correct,num_seenmsd_correct,num_seenneither_correct = 0,0,0
         num_seenlemma_guesses,num_seenmsd_guesses,num_seenneither_guesses = 0,0,0
         numcorrect,numguesses = 0,0
         if OUTPUT:
             if not TEST:
-                outfile = open(lang + ".dev", "w")
+                outfile = open(os.path.join(outpath, lang + ".dev"), "w")
             else:
-                outfile = open(lang + ".test", "w")
+                outfile = open(os.path.join(outpath, lang + ".test"), "w")
         for l in evallines:
             #lemma, correct, msd, = l.split(u'\t')
             lemma, msd, correct, = l.split(u'\t')

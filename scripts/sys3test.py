@@ -11,7 +11,9 @@ import numpy
 import re
 
 # change the path below to your folder containing data
-loc = '/path/to/your/data/'
+#loc = '/path/to/your/data/'
+loc = 'data'
+outpath = os.path.join('out', 'sys3')
 
 def ed(s,t):
 	'''edit distance'''
@@ -96,7 +98,7 @@ def makerule(b,ml):
 def doit(f):
 	'''do everything for a single language'''
 	#read file
-	F = open(loc + f,'r')
+	F = open(os.path.join(loc, f),'r')
 	t = F.read()
 	F.close()
 	t = t.strip()
@@ -135,8 +137,8 @@ def doit(f):
 	print(f'{f[:-4]} rules ready')
 	#get test/dev data
 	#for test
-	g = open(loc  + f[:-4] + '.covered.tst','r')
-	output = open(loc + 'test/' + f[:-4] + '.test','w')
+	g = open(os.path.join(loc, f[:-4] + '.covered.tst'),'r')
+	output = open(os.path.join(outpath, f[:-4] + '.test'),'w')
 	t = g.read()
 	g.close()
 	t = t.strip()
@@ -191,7 +193,7 @@ def doit(f):
 					if len(b) > len(longest):
 						longest = b
 				best = longest
-		
+
 		if type(best) != str:
 			print(best)
 			print(f[:-4] + " " + lemma + " " + best[0] + " " + "there's something wrong about this")

@@ -135,7 +135,7 @@ def prefix_suffix_rules_get(lemma, form):
             #prules.add((inp + fr[:i],outp + fr[:i]))
 
             prules.add((inp + lr[:i],outp + fr[:i])) #mh
-            
+
             prules = {(x[0].replace('_',''), x[1].replace('_','')) for x in prules}
 
     return prules, srules
@@ -191,7 +191,9 @@ def main(argv):
     #set a reasonable default path
     #TEST,OUTPUT,HELP,path = False,False,False,'../../part1/development_languages/'
     TEST,OUTPUT,HELP = False,False,False
-    path = '/home/hammond/Desktop/2023InflectionST-main/part1/data/'
+    path = 'data'
+    outpath = os.path.join('out', 'sys2')
+    #path = '/home/hammond/Desktop/2023InflectionST-main/part1/data/'
     #path = '/Users/hammond/Desktop/2023InflectionST/part1/data/'
     for opt, arg in options:
         if opt in ('-o', '--output'):
@@ -222,7 +224,7 @@ def main(argv):
     mhlangs = sorted(list(
         {re.sub('\.trn.*$','',d) for d in os.listdir(path) if '.trn' in d} #mh
     ))
-    
+
     print("Lang:\tAll\tLemmas\tMSD\tNeither")
 
     #Prefixing or suffixing************************************************
@@ -235,11 +237,11 @@ def main(argv):
 
         #check that there's training data
         #if not os.path.isfile(path + lang +  ".hall.trn"): #mh: for hallucinated
-        if not os.path.isfile(path + lang +  ".trn"):
+        if not os.path.isfile(os.path.join(path, lang +  ".trn")):
             continue
 
         #lines = [line.strip() for line in open(path + lang + ".hall.trn", "r") if line != '\n'] #for hallucinated
-        lines = [line.strip() for line in open(path + lang + ".trn", "r") if line != '\n']
+        lines = [line.strip() for line in open(os.path.join(path, lang + ".trn"), "r") if line != '\n']
 
         trainlemmas = set()
         trainmsds = set()
@@ -282,7 +284,7 @@ def main(argv):
             if ' ' not in aligned[0] and ' ' not in aligned[1] and '-' not in aligned[0] and '-' not in aligned[1]:
                 prefbias += numleadingsyms(aligned[0],'_') + numleadingsyms(aligned[1],'_')
                 suffbias += numtrailingsyms(aligned[0],'_') + numtrailingsyms(aligned[1],'_')
-        
+
 
         #get the rules******************************************************
 
@@ -294,7 +296,7 @@ def main(argv):
             lemma,msd,form = l.split(u'\t')
 
             #reverse strings if there's a prefix bias,
-            
+
             if prefbias > suffbias:
                 lemma = lemma[::-1]
                 form = form[::-1]
@@ -322,22 +324,22 @@ def main(argv):
                     allsrules[msd][(r[0],r[1])] = 1
 
         #evaluate******************************************************
-        
-        evallines = [line.strip() for line in open(path + lang + 
-                                                   ".dev", "r") if line != '\n']
-        
+
+        evallines = [line.strip() for line in open(os.path.join(path, lang +
+                                                   ".dev"), "r") if line != '\n']
+
         if TEST:
-            evallines = [line.strip() for line in 
-                         open(path + lang.split("_")[0] + 
-                              ".gold", "r") if line != '\n']
+            evallines = [line.strip() for line in
+                         open(os.path.join(path, lang.split("_")[0] +
+                              ".gold"), "r") if line != '\n']
         num_seenlemma_correct,num_seenmsd_correct,num_seenneither_correct = 0,0,0
         num_seenlemma_guesses,num_seenmsd_guesses,num_seenneither_guesses = 0,0,0
         numcorrect,numguesses = 0,0
         if OUTPUT:
             if not TEST:
-                outfile = open(lang + ".dev", "w")
+                outfile = open(os.path.join(outpath, lang + ".dev"), "w")
             else:
-                outfile = open(lang + ".test", "w")
+                outfile = open(os.path.join(outpath, lang + ".test"), "w")
 
         for l in evallines:
 
@@ -347,7 +349,7 @@ def main(argv):
 #                    lemma, msd, = l.split(u'\t')
             if prefbias > suffbias:
                 lemma = lemma[::-1]
-            
+
             #if msd not in trainmsds: newmsds += 1
 
             #wd,_ = sorted(mhtrainforms[lemma].items(),key=lambda item: item[1])[-1]
@@ -377,7 +379,7 @@ def main(argv):
             outfile.close()
 
         numlang += 1
-        
+
         if num_seenlemma_guesses:
             percentcorrect_seenlemma = num_seenlemma_correct/num_seenlemma_guesses
             totalavg_seenlemma += percentcorrect_seenlemma
@@ -413,4 +415,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv)
-
